@@ -4,48 +4,32 @@
 namespace ZfSimpleMigrations\Library;
 
 
+use Interop\Container\ContainerInterface;
 use RuntimeException;
-use Zend\ServiceManager\AbstractFactoryInterface;
-use Zend\ServiceManager\AbstractPluginManager;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
 class MigrationSkeletonGeneratorAbstractFactory implements AbstractFactoryInterface
 {
     const FACTORY_PATTERN = '/migrations\.skeletongenerator\.(.*)/';
+
     /**
-     * Determine if we can create a service with name
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param $name
-     * @param $requestedName
-     * @return bool
+     * {@inheritdoc}
      */
-    public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function canCreate(ContainerInterface $container, $name)
     {
-        return preg_match(self::FACTORY_PATTERN, $name)
-            || preg_match(self::FACTORY_PATTERN, $requestedName);
+        return (bool) preg_match(self::FACTORY_PATTERN, $name);
     }
 
     /**
-     * Create service with name
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param $name
-     * @param $requestedName
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function __invoke(ContainerInterface $container, $name, array $options = [])
     {
-        if ($serviceLocator instanceof AbstractPluginManager) {
-            $serviceLocator = $serviceLocator->getServiceLocator();
-        }
+        preg_match(self::FACTORY_PATTERN, $name, $matches);
 
-        preg_match(self::FACTORY_PATTERN, $name, $matches)
-            || preg_match(self::FACTORY_PATTERN, $requestedName, $matches);
         $migration_name = $matches[1];
 
-
-        $config = $serviceLocator->get('Config');
+        $config = $container->get('Config');
 
         if (! isset($config['migrations'][$migration_name])) {
             throw new RuntimeException(sprintf("`%s` is not in migrations configuration", $migration_name));

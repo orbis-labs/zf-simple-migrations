@@ -28,24 +28,22 @@ class MigrationVersionTableGatewayAbstractFactoryTest extends \PHPUnit_Framework
     public function test_it_indicates_what_services_it_creates()
     {
         $factory = new MigrationVersionTableGatewayAbstractFactory();
-        $this->assertTrue($factory->canCreateServiceWithName($this->service_manager,
-            'migrations.versiontablegateway.foo', 'asdf'), "should indicate it provides service for \$name");
+        $this->assertTrue($factory->canCreate($this->service_manager,
+            'migrations.versiontablegateway.foo'), "should indicate it provides service for \$name");
 
-        $this->assertTrue($factory->canCreateServiceWithName($this->service_manager,
-            'asdf', 'migrations.versiontablegateway.foo'), "should indicate it provides service for \$requestedName");
 
-        $this->assertFalse($factory->canCreateServiceWithName($this->service_manager,
-            'asdf', 'asdf'), "should indicate it does not provide service for \$name or \$requestedName");
+        $this->assertFalse($factory->canCreate($this->service_manager,
+            'asdf'), "should indicate it does not provide service for \$name or \$requestedName");
     }
 
     public function test_it_returns_a_table_gateway()
     {
         $factory = new MigrationVersionTableGatewayAbstractFactory();
-        $instance = $factory->createServiceWithName($this->service_manager, 'migrations.versiontablegateway.foo', 'asdf');
+        $instance = $factory($this->service_manager, 'migrations.versiontablegateway.foo', ['migrations.versiontablegateway.foo']);
         $this->assertInstanceOf(TableGateway::class, $instance,
             "factory should return an instance of " . TableGateway::class . " when asked by \$name");
 
-        $instance2 = $factory->createServiceWithName($this->service_manager, 'asdf', 'migrations.versiontablegateway.foo');
+        $instance2 = $factory($this->service_manager, 'migrations.versiontablegateway.foo');
         $this->assertInstanceOf(TableGateway::class, $instance2,
             "factory should return an instance of " . TableGateway::class . " when asked by \$requestedName");
     }

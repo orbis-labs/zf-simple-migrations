@@ -1,8 +1,6 @@
 <?php
 
-
 namespace ZfSimpleMigrations\UnitTest\Library;
-
 
 use Zend\Console\Console;
 use Zend\Db\Adapter\Adapter;
@@ -25,8 +23,11 @@ class MigrationAbstractFactoryTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->service_manager = new ServiceManager(new Config([
-            'allow_override' => true]));
+
+        $this->service_manager = new ServiceManager([
+            'allow_override' => true
+        ]);
+
         $this->service_manager->setService('Config', [
             'migrations' => [
                 'foo' => [
@@ -58,34 +59,26 @@ class MigrationAbstractFactoryTest extends \PHPUnit_Framework_TestCase
     public function test_it_indicates_what_services_it_creates()
     {
         $factory = new MigrationAbstractFactory();
-        $this->assertTrue($factory->canCreateServiceWithName($this->service_manager,
-            'migrations.migration.foo', 'asdf'),
+        $this->assertTrue(
+            $factory->canCreate($this->service_manager, 'migrations.migration.foo'),
             "should indicate it provides service for \$name");
 
-        $this->assertTrue($factory->canCreateServiceWithName($this->service_manager,
-            'asdf', 'migrations.migration.foo'),
-            "should indicate it provides service for \$requestedName");
-
-        $this->assertFalse($factory->canCreateServiceWithName($this->service_manager,
-            'asdf', 'asdf'),
+        $this->assertFalse(
+            $factory->canCreate($this->service_manager, 'asdf'),
             "should indicate it does not provide service for \$name or \$requestedName");
     }
 
     public function test_it_returns_a_migration()
     {
-        $controller_manager = new ControllerManager();
-        $controller_manager->setServiceLocator($this->service_manager);
-
-
         $factory = new MigrationAbstractFactory();
-        $instance = $factory->createServiceWithName($controller_manager,
-            'migrations.migration.foo', 'asdf');
+        $instance = $factory($this->service_manager, 'migrations.migration.foo');
+
         $this->assertInstanceOf(Migration::class, $instance,
             "factory should return an instance of "
             . Migration::class . " when asked by \$name");
 
-        $instance2 = $factory->createServiceWithName($this->service_manager,
-            'asdf', 'migrations.migration.foo');
+        $instance2 = $factory($this->service_manager, 'migrations.migration.foo');
+
         $this->assertInstanceOf(Migration::class, $instance2,
             "factory should return an instance of "
             . Migration::class . " when asked by \$requestedName");
@@ -93,19 +86,8 @@ class MigrationAbstractFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function test_it_injects_an_output_writer()
     {
-        $this->service_manager->setService('Config', [
-            'migrations' => [
-                'foo' => [
-                    'dir' => __DIR__,
-                    'namespace' => 'Foo',
-                    'adapter' => 'fooDb',
-                    'show_log' => true
-                ]
-            ]
-        ]);
         $factory = new MigrationAbstractFactory();
-        $instance = $factory->createServiceWithName($this->service_manager,
-            'migrations.migration.foo', 'asdf');
+        $instance = $factory($this->service_manager, 'migrations.migration.foo');
 
         $this->assertInstanceOf(OutputWriter::class, $instance->getOutputWriter(),
             "factory should inject a " . OutputWriter::class);
@@ -117,7 +99,6 @@ class MigrationAbstractFactoryTest extends \PHPUnit_Framework_TestCase
     public function test_it_complains_if_named_migration_not_configured()
     {
         $factory = new MigrationAbstractFactory();
-        $factory->createServiceWithName($this->service_manager,
-            'migrations.migration.bar', 'asdf');
+        $factory($this->service_manager, 'migrations.migration.bar');
     }
 }

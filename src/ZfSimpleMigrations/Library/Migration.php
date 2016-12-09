@@ -4,21 +4,18 @@ namespace ZfSimpleMigrations\Library;
 
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Adapter\AdapterAwareInterface;
-use Zend\Db\Adapter\Driver\Pdo\Pdo;
 use Zend\Db\Adapter\Exception\InvalidQueryException;
-use Zend\Db\Metadata\Metadata;
+use Zend\Db\Metadata\Source\Factory;
 use Zend\Db\Sql\Ddl;
 use Zend\Db\Sql\Sql;
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use ZfSimpleMigrations\Library\OutputWriter;
 use ZfSimpleMigrations\Model\MigrationVersion;
 use ZfSimpleMigrations\Model\MigrationVersionTable;
 
 /**
  * Main migration logic
  */
-class Migration implements ServiceLocatorAwareInterface
+class Migration
 {
     protected $migrationsDir;
     protected $migrationsNamespace;
@@ -54,7 +51,7 @@ class Migration implements ServiceLocatorAwareInterface
     public function __construct(Adapter $adapter, array $config, MigrationVersionTable $migrationVersionTable, OutputWriter $writer = null)
     {
         $this->adapter = $adapter;
-        $this->metadata = new Metadata($this->adapter);
+        $this->metadata = Factory::createSourceFromAdapter($adapter);
         $this->connection = $this->adapter->getDriver()->getConnection();
         $this->migrationsDir = $config['dir'];
         $this->migrationsNamespace = $config['namespace'];
@@ -90,7 +87,7 @@ class Migration implements ServiceLocatorAwareInterface
         $sql = new Sql($this->adapter);
 
         try {
-            $this->adapter->query($sql->getSqlStringForSqlObject($table), Adapter::QUERY_MODE_EXECUTE);
+            $this->adapter->query($sql->buildSqlString($table), Adapter::QUERY_MODE_EXECUTE);
         } catch (\Exception $e) {
             // currently there are no db-independent way to check if table exists
             // so we assume that table exists when we catch exception
@@ -263,19 +260,6 @@ class Migration implements ServiceLocatorAwareInterface
             /** @var $migrationObject AbstractMigration */
             $migrationObject = new $migration['class']($this->metadata, $this->outputWriter);
 
-            if ($migrationObject instanceof ServiceLocatorAwareInterface) {
-                if (is_null($this->serviceLocator)) {
-                    throw new \RuntimeException(
-                        sprintf(
-                            'Migration class %s requires a ServiceLocator, but there is no instance available.',
-                            get_class($migrationObject)
-                        )
-                    );
-                }
-
-                $migrationObject->setServiceLocator($this->serviceLocator);
-            }
-
             if ($migrationObject instanceof AdapterAwareInterface) {
                 if (is_null($this->adapter)) {
                     throw new \RuntimeException(
@@ -316,28 +300,5 @@ class Migration implements ServiceLocatorAwareInterface
             $msg = sprintf('%s; File: %s; Line #%d', $e->getMessage(), $e->getFile(), $e->getLine());
             throw new MigrationException($msg, $e->getCode(), $e);
         }
-    }
-
-    /**
-     * Set service locator
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return mixed
-     */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
-    {
-        $this->serviceLocator = $serviceLocator;
-
-        return $this;
-    }
-
-    /**
-     * Get service locator
-     *
-     * @return ServiceLocatorInterface
-     */
-    public function getServiceLocator()
-    {
-        return $this->serviceLocator;
     }
 }

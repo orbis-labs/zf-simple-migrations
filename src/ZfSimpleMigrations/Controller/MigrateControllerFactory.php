@@ -4,42 +4,31 @@
 namespace ZfSimpleMigrations\Controller;
 
 
-use Zend\Console\Request;
-use Zend\Mvc\Router\Console\RouteMatch;
-use Zend\ServiceManager\AbstractPluginManager;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Zend\Mvc\Application;
+use Zend\Router\Http\RouteMatch;
 use ZfSimpleMigrations\Library\Migration;
 use ZfSimpleMigrations\Library\MigrationSkeletonGenerator;
 
-class MigrateControllerFactory implements FactoryInterface
+class MigrateControllerFactory
 {
-
-    /**
-     * Create service
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return mixed
-     */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container)
     {
-        if($serviceLocator instanceof AbstractPluginManager)
-        {
-            $serviceLocator = $serviceLocator->getServiceLocator();
-        }
+        /** @var Application $application */
+        $application = $container->get('Application');
 
         /** @var RouteMatch $routeMatch */
-        $routeMatch = $serviceLocator->get('Application')->getMvcEvent()->getRouteMatch();
+        $routeMatch =  $application->getMvcEvent()->getRouteMatch();
 
         $name = $routeMatch->getParam('name', 'default');
 
         /** @var Migration $migration */
-        $migration = $serviceLocator->get('migrations.migration.' . $name);
+        $migration = $container->get('migrations.migration.' . $name);
+
         /** @var MigrationSkeletonGenerator $generator */
-        $generator = $serviceLocator->get('migrations.skeleton-generator.' . $name);
+        $generator = $container->get('migrations.skeleton-generator.' . $name);
 
         $controller = new MigrateController();
-
         $controller->setMigration($migration);
         $controller->setSkeletonGenerator($generator);
 

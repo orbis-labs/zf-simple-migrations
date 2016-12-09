@@ -18,8 +18,11 @@ class MigrationSkeletonGeneratorAbstractFactoryTest extends \PHPUnit_Framework_T
     public function setUp()
     {
         parent::setUp();
-        $this->service_manager = new ServiceManager(new Config(
-            ['allow_override' => true]));
+
+        $this->service_manager = new ServiceManager([
+            'allow_override' => true
+        ]);
+
         $this->service_manager->setService('Config', [
             'migrations' => [
                 'foo' => [
@@ -36,33 +39,29 @@ class MigrationSkeletonGeneratorAbstractFactoryTest extends \PHPUnit_Framework_T
     public function test_it_indicates_what_services_it_creates()
     {
         $factory = new MigrationSkeletonGeneratorAbstractFactory();
-        $this->assertTrue($factory->canCreateServiceWithName($this->service_manager,
-            'migrations.skeletongenerator.foo', 'asdf'),
+
+        $this->assertTrue($factory->canCreate($this->service_manager,
+            'migrations.skeletongenerator.foo'),
             "should indicate it provides service for \$name");
 
-        $this->assertTrue($factory->canCreateServiceWithName($this->service_manager,
-            'asdf', 'migrations.skeletongenerator.foo'),
-            "should indicate it provides service for \$requestedName");
+        $this->assertTrue($factory->canCreate($this->service_manager,
+            'migrations.skeletongenerator.bar'),
+            "should indicate it provides service for \$name");
 
-        $this->assertFalse($factory->canCreateServiceWithName($this->service_manager,
-            'asdf', 'asdf'),
+        $this->assertFalse(
+            $factory->canCreate($this->service_manager, 'asdf'),
             "should indicate it does not provide service for \$name or \$requestedName");
     }
 
     public function test_it_returns_a_skeleton_generator()
     {
-        $controller_manager = new ControllerManager();
-        $controller_manager->setServiceLocator($this->service_manager);
-
         $factory = new MigrationSkeletonGeneratorAbstractFactory();
-        $instance = $factory->createServiceWithName($controller_manager,
-            'migrations.skeletongenerator.foo', 'asdf');
+        $instance = $factory($this->service_manager, 'migrations.skeletongenerator.foo');
         $this->assertInstanceOf(MigrationSkeletonGenerator::class, $instance,
             "factory should return an instance of "
             . MigrationSkeletonGenerator::class . " when asked by \$name");
 
-        $instance2 = $factory->createServiceWithName($this->service_manager,
-            'asdf', 'migrations.skeletongenerator.foo');
+        $instance2 = $factory($this->service_manager, 'migrations.skeletongenerator.foo');
         $this->assertInstanceOf(MigrationSkeletonGenerator::class, $instance2,
             "factory should return an instance of "
             . MigrationSkeletonGenerator::class . " when asked by \$requestedName");
@@ -74,8 +73,7 @@ class MigrationSkeletonGeneratorAbstractFactoryTest extends \PHPUnit_Framework_T
     public function test_it_complains_if_named_migration_is_not_configured()
     {
         $factory = new MigrationSkeletonGeneratorAbstractFactory();
-        $factory->createServiceWithName($this->service_manager,
-            'migrations.skeletongenerator.bar', 'asdf');
+        $factory($this->service_manager, 'migrations.skeletongenerator.bar');
     }
 
     /**
@@ -83,17 +81,8 @@ class MigrationSkeletonGeneratorAbstractFactoryTest extends \PHPUnit_Framework_T
      */
     public function test_it_complains_if_dir_is_not_configured()
     {
-        $this->service_manager->setService('Config', [
-            'migrations' => [
-                'bar' => [
-                    'namespace' => 'Bar'
-                ]
-            ]
-        ]);
-
         $factory = new MigrationSkeletonGeneratorAbstractFactory();
-        $factory->createServiceWithName($this->service_manager,
-            'migrations.skeletongenerator.bar', 'asdf');
+        $factory($this->service_manager, 'migrations.skeletongenerator.bar');
     }
 
     /**
@@ -101,6 +90,10 @@ class MigrationSkeletonGeneratorAbstractFactoryTest extends \PHPUnit_Framework_T
      */
     public function test_it_complains_if_namespace_is_not_configured()
     {
+        $this->service_manager = new ServiceManager([
+            'allow_override' => true
+        ]);
+
         $this->service_manager->setService('Config', [
             'migrations' => [
                 'bar' => [
@@ -110,7 +103,7 @@ class MigrationSkeletonGeneratorAbstractFactoryTest extends \PHPUnit_Framework_T
         ]);
 
         $factory = new MigrationSkeletonGeneratorAbstractFactory();
-        $factory->createServiceWithName($this->service_manager,
-            'migrations.skeletongenerator.bar', 'asdf');
+        $factory($this->service_manager,
+            'migrations.skeletongenerator.bar');
     }
 }

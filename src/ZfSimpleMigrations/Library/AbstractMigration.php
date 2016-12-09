@@ -3,7 +3,6 @@
 namespace ZfSimpleMigrations\Library;
 
 use Zend\Db\Metadata\MetadataInterface;
-use ZfSimpleMigrations\Library\MigrationInterface;
 
 abstract class AbstractMigration implements MigrationInterface
 {

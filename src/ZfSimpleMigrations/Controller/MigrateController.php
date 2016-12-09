@@ -5,9 +5,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Mvc\MvcEvent;
 use Zend\Console\Request as ConsoleRequest;
 use ZfSimpleMigrations\Library\Migration;
-use ZfSimpleMigrations\Library\MigrationException;
 use ZfSimpleMigrations\Library\MigrationSkeletonGenerator;
-use ZfSimpleMigrations\Library\OutputWriter;
 
 /**
  * Migration commands controller
@@ -18,6 +16,7 @@ class MigrateController extends AbstractActionController
      * @var \ZfSimpleMigrations\Library\Migration
      */
     protected $migration;
+
     /** @var  MigrationSkeletonGenerator */
     protected $skeleton_generator;
 
@@ -51,7 +50,7 @@ class MigrateController extends AbstractActionController
     /**
      * Overridden only for PHPDoc return value for IDE code helpers
      *
-     * @return ConsoleRequest
+     * @return ConsoleRequest|\Zend\Stdlib\RequestInterface
      */
     public function getRequest()
     {
