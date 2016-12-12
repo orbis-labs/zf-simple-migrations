@@ -25,10 +25,6 @@ class MigrationVersionTableGatewayAbstractFactory implements AbstractFactoryInte
      */
     public function __invoke(ContainerInterface $container, $name, array $options = [])
     {
-        if(!$this->canCreate($container, $name)) {
-            throw new MigrationException(sprintf('Cannot create migration tablegateway %s', $name));
-        }
-
         preg_match(self::FACTORY_PATTERN, $name, $matches);
         $adapter_name = $matches[1];
 

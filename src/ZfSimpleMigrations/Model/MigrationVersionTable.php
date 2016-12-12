@@ -38,7 +38,7 @@ class MigrationVersionTable
         $result = $this->tableGateway->select(function (Select $select) {
             $select->order('version DESC')->limit(1);
         });
-        if (!$result->count()) return 0;
-        return $result->current()->getVersion();
+
+        return !$result->count() ? 0: $result->current()->getVersion();
     }
 }

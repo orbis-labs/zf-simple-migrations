@@ -27,12 +27,8 @@ class MigrateController extends AbstractActionController
     {
         return $this->skeleton_generator;
     }
-
-    /**
-     * @param MigrationSkeletonGenerator $skeleton_generator
-     * @return self
-     */
-    public function setSkeletonGenerator($skeleton_generator)
+    
+    public function setSkeletonGenerator(MigrationSkeletonGenerator $skeleton_generator)
     {
         $this->skeleton_generator = $skeleton_generator;
         return $this;

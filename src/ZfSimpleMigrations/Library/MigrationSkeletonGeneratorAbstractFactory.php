@@ -1,8 +1,6 @@
 <?php
 
-
 namespace ZfSimpleMigrations\Library;
-
 
 use Interop\Container\ContainerInterface;
 use RuntimeException;

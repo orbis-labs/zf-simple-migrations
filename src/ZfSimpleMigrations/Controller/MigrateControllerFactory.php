@@ -1,8 +1,6 @@
 <?php
 
-
 namespace ZfSimpleMigrations\Controller;
-
 
 use Interop\Container\ContainerInterface;
 use Zend\Mvc\Application;
