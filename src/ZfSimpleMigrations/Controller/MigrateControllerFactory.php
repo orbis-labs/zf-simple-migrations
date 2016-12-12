@@ -24,7 +24,7 @@ class MigrateControllerFactory
         $migration = $container->get('migrations.migration.' . $name);
 
         /** @var MigrationSkeletonGenerator $generator */
-        $generator = $container->get('migrations.skeleton-generator.' . $name);
+        $generator = $container->get('migrations.skeletongenerator.' . $name);
 
         $controller = new MigrateController();
         $controller->setMigration($migration);
