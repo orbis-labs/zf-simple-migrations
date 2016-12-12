@@ -23,7 +23,7 @@ class MigrationVersionTableGatewayAbstractFactory implements AbstractFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = [])
+    public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
         preg_match(self::FACTORY_PATTERN, $name, $matches);
         $adapter_name = $matches[1];

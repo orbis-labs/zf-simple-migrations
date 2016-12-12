@@ -14,7 +14,7 @@ class MigrationAbstractFactory implements AbstractFactoryInterface
     /**
      * @return Migration
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = [])
+    public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
         $config = $container->get('Config');
 

@@ -66,6 +66,7 @@ use Zend\Db\Metadata\MetadataInterface;
 class %s extends AbstractMigration
 {
     public static $description = "Migration description";
+    public static $author      = "Orbis Team";
 
     public function up(MetadataInterface $schema)
     {

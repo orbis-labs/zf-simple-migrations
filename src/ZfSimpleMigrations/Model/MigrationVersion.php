@@ -1,8 +1,9 @@
 <?php
 namespace ZfSimpleMigrations\Model;
 
+use ArrayObject;
 
-class MigrationVersion
+class MigrationVersion extends ArrayObject
 {
     const TABLE_NAME = 'migration_version';
 

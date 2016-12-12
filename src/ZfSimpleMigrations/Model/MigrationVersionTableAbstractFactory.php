@@ -21,7 +21,7 @@ class MigrationVersionTableAbstractFactory implements AbstractFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = [])
+    public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
         // $matches will be set by first preg_match if it matches, or second preg_match if it doesnt
         preg_match(self::FACTORY_PATTERN, $name, $matches);

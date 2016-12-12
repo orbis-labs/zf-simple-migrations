@@ -21,7 +21,7 @@ class MigrationSkeletonGeneratorAbstractFactory implements AbstractFactoryInterf
     /**
      * {@inheritdoc}
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = [])
+    public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
         preg_match(self::FACTORY_PATTERN, $name, $matches);
 
