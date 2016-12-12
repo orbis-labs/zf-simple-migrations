@@ -24,7 +24,7 @@ class MigrateControllerFactoryTest extends \PHPUnit_Framework_TestCase
         $this->service_manager = new ServiceManager();
         $this->service_manager->setService('migrations.migration.foo',
             $this->getMock(Migration::class, [], [], '', false));
-        $this->service_manager->setService('migrations.skeleton-generator.foo',
+        $this->service_manager->setService('migrations.skeletongenerator.foo',
             $this->getMock(MigrationSkeletonGenerator::class, [], [], '', false));
         $this->service_manager->setService('Application',
             $application = $this->getMock(Application::class, [], [], '', false));
